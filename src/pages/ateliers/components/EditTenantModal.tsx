@@ -99,9 +99,9 @@ export default function EditTenantModal({
               {t('ateliers.edit.plan')}
             </label>
             <select value={plan} onChange={(e) => setPlan(e.target.value)} className={inputCls}>
-              <option value="basic">{t('ateliers.create.plans.basic')}</option>
-              <option value="professional">{t('ateliers.create.plans.professional')}</option>
-              <option value="enterprise">{t('ateliers.create.plans.enterprise')}</option>
+              <option value="basic">{t('plan_tiers.basic')}</option>
+              <option value="professional">{t('plan_tiers.professional')}</option>
+              <option value="enterprise">{t('plan_tiers.enterprise')}</option>
             </select>
           </div>
 

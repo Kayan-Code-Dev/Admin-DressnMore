@@ -119,9 +119,9 @@ export default function CreateTenantModal({ open, onClose, onCreated }: CreateTe
               onChange={(e) => set('plan', e.target.value)}
               className={inputCls}
             >
-              <option value="basic">{t('ateliers.create.plans.basic')}</option>
-              <option value="professional">{t('ateliers.create.plans.professional')}</option>
-              <option value="enterprise">{t('ateliers.create.plans.enterprise')}</option>
+              <option value="basic">{t('plan_tiers.basic')}</option>
+              <option value="professional">{t('plan_tiers.professional')}</option>
+              <option value="enterprise">{t('plan_tiers.enterprise')}</option>
             </select>
           </div>
 

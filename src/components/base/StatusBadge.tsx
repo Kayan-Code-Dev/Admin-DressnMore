@@ -47,7 +47,12 @@ const planColors: Record<string, string> = {
   enterprise:   'bg-amber-50 text-amber-700',
 };
 
+function planTierLookupKey(plan: string): string {
+  return plan.trim().toLowerCase().replace(/\s+/g, '_');
+}
+
 export function PlanBadge({ plan }: PlanBadgeProps) {
+  const { t } = useTranslation();
   const key = plan.trim();
   const normalized =
     key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
@@ -56,9 +61,11 @@ export function PlanBadge({ plan }: PlanBadgeProps) {
     planColors[key.toLowerCase()] ??
     planColors[normalized] ??
     'bg-gray-100 text-gray-600';
+  const tierKey = planTierLookupKey(key);
+  const label = t(`plan_tiers.${tierKey}`, { defaultValue: key });
   return (
     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${cls}`}>
-      {plan}
+      {label}
     </span>
   );
 }

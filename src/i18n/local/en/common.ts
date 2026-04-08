@@ -42,6 +42,14 @@ const en = {
     no_ateliers: 'No ateliers found', no_subscriptions: 'No subscriptions found',
     ateliers_count: 'ateliers', subscriptions_count: 'subscriptions',
   },
+  /** Tenant/subscription plan tier labels (API slugs + common aliases) */
+  plan_tiers: {
+    basic: 'Basic',
+    professional: 'Professional',
+    enterprise: 'Enterprise',
+    starter: 'Starter',
+    pro: 'Pro',
+  },
   ateliers: {
     filter: { all: 'All', active: 'Active', suspended: 'Suspended', pending: 'Pending', trial: 'Trial' },
     search_placeholder: 'Search ateliers...', add_atelier: 'Add Atelier',
@@ -98,7 +106,6 @@ const en = {
         plan: 'Plan',
         trial_days: 'Trial days',
       },
-      plans: { basic: 'Basic', professional: 'Professional', enterprise: 'Enterprise' },
     },
     edit: {
       title: 'Edit atelier',

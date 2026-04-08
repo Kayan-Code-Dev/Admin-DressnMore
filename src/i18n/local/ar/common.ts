@@ -42,6 +42,13 @@ const ar = {
     no_ateliers: 'لا توجد أتيليهات', no_subscriptions: 'لا توجد اشتراكات',
     ateliers_count: 'أتيليه', subscriptions_count: 'اشتراك',
   },
+  plan_tiers: {
+    basic: 'أساسية',
+    professional: 'احترافية',
+    enterprise: 'مؤسسات',
+    starter: 'ستارتر',
+    pro: 'برو',
+  },
   ateliers: {
     filter: { all: 'الكل', active: 'نشط', suspended: 'موقوف', pending: 'معلق', trial: 'تجريبي' },
     search_placeholder: 'ابحث عن أتيليه...', add_atelier: 'إضافة أتيليه',
@@ -98,7 +105,6 @@ const ar = {
         plan: 'الباقة',
         trial_days: 'أيام التجربة',
       },
-      plans: { basic: 'أساسية', professional: 'احترافية', enterprise: 'مؤسسات' },
     },
     edit: {
       title: 'تعديل الأتيليه',
