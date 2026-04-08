@@ -1,6 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router-dom';
 import NotFound from '../pages/NotFound';
 import LoginPage from '../pages/login/page';
+import { isAuthenticated } from '../lib/session';
 import DashboardPage from '../pages/dashboard/page';
 import AteliersPage from '../pages/ateliers/page';
 import SubscriptionsPage from '../pages/subscriptions/page';
@@ -17,15 +18,13 @@ import LogsPage from '../pages/logs/page';
 import ComingSoonPage from '../pages/ComingSoon';
 import PaymentGatewaysPage from '../pages/payment-gateways/page';
 
-const AUTH_KEY = 'dressnmore_admin_auth';
-
 function AuthGuard({ children }: { children: React.ReactElement }) {
-  const isAuth = localStorage.getItem(AUTH_KEY) === 'true';
-  return isAuth ? children : <Navigate to="/login" replace />;
+  return isAuthenticated() ? children : <Navigate to="/admin/login" replace />;
 }
 
 const routes: RouteObject[] = [
-  { path: '/login',         element: <LoginPage /> },
+  { path: '/login',         element: <Navigate to="/admin/login" replace /> },
+  { path: '/admin/login',   element: <LoginPage /> },
   { path: '/',              element: <AuthGuard><Navigate to="/dashboard" replace /></AuthGuard> },
   { path: '/dashboard',     element: <AuthGuard><DashboardPage /></AuthGuard> },
   { path: '/ateliers',      element: <AuthGuard><AteliersPage /></AuthGuard> },

@@ -42,10 +42,20 @@ const planColors: Record<string, string> = {
   Starter:    'bg-gray-100 text-gray-700',
   Pro:        'bg-teal-50 text-teal-700',
   Enterprise: 'bg-amber-50 text-amber-700',
+  basic:        'bg-gray-100 text-gray-700',
+  professional: 'bg-teal-50 text-teal-700',
+  enterprise:   'bg-amber-50 text-amber-700',
 };
 
 export function PlanBadge({ plan }: PlanBadgeProps) {
-  const cls = planColors[plan] ?? 'bg-gray-100 text-gray-600';
+  const key = plan.trim();
+  const normalized =
+    key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
+  const cls =
+    planColors[key] ??
+    planColors[key.toLowerCase()] ??
+    planColors[normalized] ??
+    'bg-gray-100 text-gray-600';
   return (
     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${cls}`}>
       {plan}
@@ -59,9 +69,19 @@ interface ActionIconButtonProps {
   onClick?: () => void;
   variant?: 'default' | 'danger' | 'warning' | 'success';
   children?: ReactNode;
+  disabled?: boolean;
+  /** Adds `animate-spin` to the icon (e.g. with `ri-loader-4-line`) */
+  spinIcon?: boolean;
 }
 
-export function ActionIconButton({ icon, label, onClick, variant = 'default' }: ActionIconButtonProps) {
+export function ActionIconButton({
+  icon,
+  label,
+  onClick,
+  variant = 'default',
+  disabled,
+  spinIcon,
+}: ActionIconButtonProps) {
   const variantClass = {
     default: 'text-gray-500 hover:text-teal-600 hover:bg-teal-50',
     danger:  'text-gray-500 hover:text-rose-600 hover:bg-rose-50',
@@ -73,10 +93,15 @@ export function ActionIconButton({ icon, label, onClick, variant = 'default' }: 
     <button
       type="button"
       title={label}
+      disabled={disabled}
       onClick={onClick}
-      className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${variantClass}`}
+      className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
+        disabled
+          ? 'opacity-40 cursor-not-allowed text-gray-400'
+          : `cursor-pointer ${variantClass}`
+      }`}
     >
-      <i className={`${icon} text-base`} />
+      <i className={`${icon} text-base ${spinIcon ? 'animate-spin' : ''}`} />
     </button>
   );
 }

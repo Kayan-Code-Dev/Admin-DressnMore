@@ -2,10 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../hooks/useLanguage';
-
-const DEMO_EMAIL    = 'admin@dressnmore.it.com';
-const DEMO_PASSWORD = 'Admin@2026';
-const AUTH_KEY      = 'dressnmore_admin_auth';
+import { loginAdmin } from '../../api/admin.api';
+import { isAuthenticated } from '../../lib/session';
 
 export default function LoginPage() {
   const { t, i18n } = useTranslation();
@@ -19,22 +17,23 @@ export default function LoginPage() {
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
 
-  if (localStorage.getItem(AUTH_KEY) === 'true') return <Navigate to="/dashboard" replace />;
+  if (isAuthenticated()) return <Navigate to="/dashboard" replace />;
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!email.trim() || !password.trim()) { setError(t('login.error')); return; }
+    if (!email.trim() || !password.trim()) {
+      setError(t('login.error'));
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
-      if (email.trim() === DEMO_EMAIL && password === DEMO_PASSWORD) {
-        localStorage.setItem(AUTH_KEY, 'true');
-        navigate('/dashboard', { replace: true });
-      } else {
-        setError(t('login.error'));
-        setLoading(false);
-      }
-    }, 1200);
+    const result = await loginAdmin(email.trim(), password);
+    setLoading(false);
+    if (result.ok === false) {
+      setError(result.message || t('login.error'));
+      return;
+    }
+    navigate('/dashboard', { replace: true });
   };
 
   const inputCls = 'w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 transition-all bg-white placeholder:text-gray-400';
@@ -162,25 +161,6 @@ export default function LoginPage() {
                 }
               </button>
             </form>
-
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-white rounded-xl ring-1 ring-gray-100">
-              <p className="text-xs font-semibold text-gray-500 mb-2.5 uppercase tracking-wide">{t('login.demo_hint')}</p>
-              <div className="space-y-1.5">
-                {[
-                  { label: 'Email',    value: DEMO_EMAIL,    icon: 'ri-mail-line'    },
-                  { label: 'Password', value: DEMO_PASSWORD, icon: 'ri-key-2-line'   },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-2">
-                    <div className="w-4 h-4 flex items-center justify-center text-gray-400"><i className={`${item.icon} text-xs`} /></div>
-                    <span className="text-xs text-gray-500">{item.label}:</span>
-                    <span className="text-xs font-mono font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">{item.value}</span>
-                    <button type="button" onClick={() => { if (item.label === 'Email') setEmail(item.value); else setPassword(item.value); }}
-                      className="text-xs text-teal-600 hover:text-teal-700 cursor-pointer transition-colors">Fill</button>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>

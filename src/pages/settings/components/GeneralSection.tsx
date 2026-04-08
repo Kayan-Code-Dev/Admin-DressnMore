@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { changeAdminPassword } from '../../../api/admin.api';
 
 interface FieldProps {
   label: string;
@@ -59,6 +61,7 @@ const inputCls = 'w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg f
 
 export default function GeneralSection() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
   const [form, setForm] = useState({
     platformName: 'Dressnmore', supportEmail: 'support@dressnmore.sa',
@@ -67,10 +70,48 @@ export default function GeneralSection() {
     maintenanceMode: false,
   });
 
+  const [pw, setPw] = useState({ current: '', next: '', confirm: '' });
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState('');
+  const [pwSuccess, setPwSuccess] = useState(false);
+  const [showPw, setShowPw] = useState({ current: false, next: false, confirm: false });
+
   const set = (key: keyof typeof form, val: string | number | boolean) =>
     setForm((p) => ({ ...p, [key]: val }));
 
   const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 3000); };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError('');
+    setPwSuccess(false);
+    if (!pw.current.trim() || !pw.next.trim() || !pw.confirm.trim()) {
+      setPwError(t('settings.general.password_fill_all'));
+      return;
+    }
+    if (pw.next !== pw.confirm) {
+      setPwError(t('settings.general.password_mismatch'));
+      return;
+    }
+    setPwLoading(true);
+    const result = await changeAdminPassword({
+      current_password: pw.current,
+      new_password: pw.next,
+      new_password_confirmation: pw.confirm,
+    });
+    setPwLoading(false);
+    if (result.ok === false) {
+      if (result.unauthorized) {
+        navigate('/admin/login', { replace: true });
+        return;
+      }
+      setPwError(result.message || t('login.error'));
+      return;
+    }
+    setPwSuccess(true);
+    setPw({ current: '', next: '', confirm: '' });
+    setTimeout(() => setPwSuccess(false), 5000);
+  };
 
   const currencies = ['SAR', 'USD', 'AED', 'KWD', 'BHD', 'OMR', 'QAR', 'EGP'];
   const timezones  = ['Asia/Riyadh', 'Asia/Dubai', 'Asia/Kuwait', 'Africa/Cairo', 'UTC'];
@@ -119,6 +160,98 @@ export default function GeneralSection() {
           checked={form.maintenanceMode}
           onChange={() => set('maintenanceMode', !form.maintenanceMode)}
         />
+
+        <div className="border-t border-gray-100 pt-6 mt-2">
+          <div className="mb-5">
+            <h4 className="text-sm font-bold text-gray-900">{t('settings.general.password_section_title')}</h4>
+            <p className="text-xs text-gray-400 mt-0.5">{t('settings.general.password_section_subtitle')}</p>
+          </div>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-xl">
+            <Field label={t('settings.general.current_password')}>
+              <div className="relative">
+                <input
+                  type={showPw.current ? 'text' : 'password'}
+                  value={pw.current}
+                  onChange={(e) => { setPw((p) => ({ ...p, current: e.target.value })); setPwError(''); }}
+                  autoComplete="current-password"
+                  className={`${inputCls} pe-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw((s) => ({ ...s, current: !s.current }))}
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                  aria-label="toggle"
+                >
+                  <i className={`${showPw.current ? 'ri-eye-off-line' : 'ri-eye-line'} text-base`} />
+                </button>
+              </div>
+            </Field>
+            <Field label={t('settings.general.new_password')}>
+              <div className="relative">
+                <input
+                  type={showPw.next ? 'text' : 'password'}
+                  value={pw.next}
+                  onChange={(e) => { setPw((p) => ({ ...p, next: e.target.value })); setPwError(''); }}
+                  autoComplete="new-password"
+                  className={`${inputCls} pe-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw((s) => ({ ...s, next: !s.next }))}
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                  aria-label="toggle"
+                >
+                  <i className={`${showPw.next ? 'ri-eye-off-line' : 'ri-eye-line'} text-base`} />
+                </button>
+              </div>
+            </Field>
+            <Field label={t('settings.general.confirm_password')}>
+              <div className="relative">
+                <input
+                  type={showPw.confirm ? 'text' : 'password'}
+                  value={pw.confirm}
+                  onChange={(e) => { setPw((p) => ({ ...p, confirm: e.target.value })); setPwError(''); }}
+                  autoComplete="new-password"
+                  className={`${inputCls} pe-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw((s) => ({ ...s, confirm: !s.confirm }))}
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                  aria-label="toggle"
+                >
+                  <i className={`${showPw.confirm ? 'ri-eye-off-line' : 'ri-eye-line'} text-base`} />
+                </button>
+              </div>
+            </Field>
+            {pwError && (
+              <div className="flex items-center gap-2 px-3 py-2.5 bg-rose-50 rounded-lg border border-rose-100 text-sm text-rose-600">
+                <i className="ri-error-warning-line flex-shrink-0" />
+                {pwError}
+              </div>
+            )}
+            {pwSuccess && (
+              <div className="flex items-center gap-2 px-3 py-2.5 bg-emerald-50 rounded-lg border border-emerald-100 text-sm text-emerald-700">
+                <i className="ri-checkbox-circle-fill flex-shrink-0" />
+                {t('settings.general.password_success')}
+              </div>
+            )}
+            <button
+              type="submit"
+              disabled={pwLoading}
+              className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {pwLoading ? (
+                <span className="flex items-center gap-2">
+                  <i className="ri-loader-4-line animate-spin" />
+                  {t('settings.general.password_updating')}
+                </span>
+              ) : (
+                t('settings.general.update_password')
+              )}
+            </button>
+          </form>
+        </div>
 
         <SaveBar onSave={handleSave} saved={saved} />
       </div>

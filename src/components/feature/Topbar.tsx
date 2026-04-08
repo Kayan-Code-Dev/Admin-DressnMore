@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useAdminProfile } from '../../contexts/AdminProfileContext';
+import { logout as clearAuth } from '../../api/admin.api';
+
+function initialsFromName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase();
+  return name.slice(0, 2).toUpperCase() || '—';
+}
 
 export default function Topbar() {
   const location   = useLocation();
@@ -11,16 +19,17 @@ export default function Topbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [notifCount] = useState(5);
+  const { admin, loading: profileLoading } = useAdminProfile();
 
   const rawKey  = location.pathname.split('/')[1] || 'dashboard';
   const pageKey = rawKey.replace(/-/g, '_');
   const title    = t(`page.${pageKey}.title`,    { defaultValue: rawKey });
   const subtitle = t(`page.${pageKey}.subtitle`, { defaultValue: '' });
 
-  const handleSignOut = () => {
-    localStorage.removeItem('dressnmore_admin_auth');
+  const handleSignOut = async () => {
+    await clearAuth();
     setProfileOpen(false);
-    navigate('/login', { replace: true });
+    navigate('/admin/login', { replace: true });
   };
 
   // ... existing code ...
@@ -62,8 +71,12 @@ export default function Topbar() {
         <div className="relative">
           <button type="button" onClick={() => setProfileOpen((prev) => !prev)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center rounded-full bg-teal-600 text-white text-xs font-bold flex-shrink-0">SA</div>
-            <span className="text-sm font-semibold text-gray-800 hidden sm:block">{t('admin.role')}</span>
+            <div className="w-8 h-8 flex items-center justify-center rounded-full bg-teal-600 text-white text-xs font-bold flex-shrink-0">
+              {profileLoading && !admin ? '…' : admin ? initialsFromName(admin.name) : '—'}
+            </div>
+            <span className="text-sm font-semibold text-gray-800 hidden sm:block truncate max-w-[140px]">
+              {admin?.name ?? t('admin.role')}
+            </span>
             <div className="w-4 h-4 flex items-center justify-center text-gray-400">
               <i className={`ri-arrow-${profileOpen ? 'up' : 'down'}-s-line text-base`} />
             </div>
