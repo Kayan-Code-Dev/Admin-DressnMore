@@ -56,6 +56,9 @@ export default [
       globals: {
         ...globals.browser,
         ...autoImportGlobals,
+        /** DOM types used in type positions (no-undef otherwise flags them) */
+        RequestInit: 'readonly',
+        BodyInit: 'readonly',
         NodeJS: 'readonly',
         JSX: 'readonly',
         IdleRequestCallback: 'readonly',
@@ -74,7 +77,10 @@ export default [
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
-        { allowConstantExport: true },
+        {
+          allowConstantExport: true,
+          allowExportNames: ['useAdminProfile', 'COLORS', 'colorCfg', 'RoleColor'],
+        },
       ],
       '@typescript-eslint/no-namespace': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

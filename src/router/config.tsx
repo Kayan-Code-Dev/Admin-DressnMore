@@ -1,7 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router-dom';
 import NotFound from '../pages/NotFound';
 import LoginPage from '../pages/login/page';
-import { isAuthenticated } from '../lib/session';
+import { AuthGuard } from './AuthGuard';
 import DashboardPage from '../pages/dashboard/page';
 import AteliersPage from '../pages/ateliers/page';
 import SubscriptionsPage from '../pages/subscriptions/page';
@@ -17,10 +17,6 @@ import MarketingPage from '../pages/marketing/page';
 import LogsPage from '../pages/logs/page';
 import ComingSoonPage from '../pages/ComingSoon';
 import PaymentGatewaysPage from '../pages/payment-gateways/page';
-
-function AuthGuard({ children }: { children: React.ReactElement }) {
-  return isAuthenticated() ? children : <Navigate to="/admin/login" replace />;
-}
 
 const routes: RouteObject[] = [
   { path: '/login',         element: <Navigate to="/admin/login" replace /> },
