@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { changeAdminPassword } from '../../../api/admin.api';
+import { brandLogoUrl } from '../../../config/branding';
 
 interface FieldProps {
   label: string;
@@ -66,7 +67,7 @@ export default function GeneralSection() {
   const [form, setForm] = useState({
     platformName: 'Dressnmore', supportEmail: 'support@dressnmore.sa',
     currency: 'SAR', timezone: 'Asia/Riyadh', trialDays: 14,
-    logoUrl: 'https://static.readdy.ai/image/dd76bd9e94ab1e595fa3cdea807c4d5b/3865dc1217a516805dbcd654d744a8d8.png',
+    logoUrl: brandLogoUrl,
     maintenanceMode: false,
   });
 

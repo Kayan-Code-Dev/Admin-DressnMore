@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { brandLogoUrl } from '../../../config/branding';
 import { type Payment } from '../../../mocks/payments';
 
 const methodConfig: Record<string, { icon: string; color: string }> = {
@@ -37,7 +38,7 @@ export default function InvoiceModal({ payment, onClose }: InvoiceModalProps) {
         <div className="px-6 pt-6 pb-4 border-b border-gray-100">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <img src="https://static.readdy.ai/image/dd76bd9e94ab1e595fa3cdea807c4d5b/3865dc1217a516805dbcd654d744a8d8.png" alt="Dressnmore" className="h-8 w-auto object-contain mb-2" />
+              <img src={brandLogoUrl} alt="Dressnmore" className="h-8 w-auto object-contain mb-2" />
               <p className="text-xs text-gray-400">admin@dressnmore.sa</p>
             </div>
             <div className="text-end">

@@ -3,6 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../hooks/useLanguage';
 import { loginAdmin } from '../../api/admin.api';
+import { brandLogoUrl } from '../../config/branding';
 import { isAuthenticated } from '../../lib/session';
 
 export default function LoginPage() {
@@ -48,7 +49,7 @@ export default function LoginPage() {
 
         {/* Top: Logo */}
         <div className="relative z-10">
-          <img src="https://static.readdy.ai/image/dd76bd9e94ab1e595fa3cdea807c4d5b/3865dc1217a516805dbcd654d744a8d8.png"
+          <img src={brandLogoUrl}
             alt="Dressnmore" className="h-10 object-contain object-left mb-8" />
           <h1 className="text-3xl font-bold text-white leading-tight mb-3">{t('login.brand_title')}</h1>
           <p className="text-sm text-gray-400 leading-relaxed max-w-xs">{t('login.brand_desc')}</p>
@@ -104,7 +105,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md">
             {/* Mobile Logo */}
             <div className="lg:hidden mb-8 text-center">
-              <img src="https://static.readdy.ai/image/dd76bd9e94ab1e595fa3cdea807c4d5b/3865dc1217a516805dbcd654d744a8d8.png"
+              <img src={brandLogoUrl}
                 alt="Dressnmore" className="h-8 object-contain mx-auto mb-3" />
             </div>
 
