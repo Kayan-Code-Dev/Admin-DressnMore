@@ -15,7 +15,7 @@ import {
   fetchTenantsList,
   toggleTenantActive,
 } from '../../../api/tenants.api';
-import { buildTenantPortalUrl } from '../../../config/tenantPortal.config';
+import { resolveTenantPortalUrl } from '../../../config/tenantPortal.config';
 import { tenantRowStatus, primaryDomain, formatTenantDate } from '../../../lib/tenant.utils';
 import type { Tenant } from '../../../types/tenant.types';
 
@@ -108,12 +108,13 @@ export default function AteliersTable({
     const q = globalFilter.trim().toLowerCase();
     if (!q) return list;
     return list.filter((r) => {
-      const slug = primaryDomain(r);
-      const portalUrl = buildTenantPortalUrl(slug);
+      const raw = primaryDomain(r);
+      const portalUrl =
+        raw && raw !== '—' ? resolveTenantPortalUrl(raw) : null;
       return (
         r.name.toLowerCase().includes(q) ||
         r.email.toLowerCase().includes(q) ||
-        slug.toLowerCase().includes(q) ||
+        raw.toLowerCase().includes(q) ||
         (portalUrl?.toLowerCase().includes(q) ?? false) ||
         r.admin_name.toLowerCase().includes(q)
       );
@@ -155,8 +156,9 @@ export default function AteliersTable({
         id: 'domain',
         header: () => t('ateliers.col.domain'),
         cell: (info) => {
-          const slug = primaryDomain(info.row.original);
-          const url = buildTenantPortalUrl(slug);
+          const raw = primaryDomain(info.row.original);
+          const url =
+            raw && raw !== '—' ? resolveTenantPortalUrl(raw) : null;
           if (!url) {
             return <span className="text-sm text-gray-400">—</span>;
           }
