@@ -17,11 +17,8 @@ const defaultForm: CreateTenantPayload = {
   name: '',
   email: '',
   domain: '',
-  admin_name: '',
-  admin_email: '',
-  admin_password: '',
-  plan: 'basic',
-  trial_days: 14,
+  password: '',
+  phone: '',
 };
 
 export default function CreateTenantModal({ open, onClose, onCreated }: CreateTenantModalProps) {
@@ -65,6 +62,18 @@ export default function CreateTenantModal({ open, onClose, onCreated }: CreateTe
     }
   };
 
+  const fields: {
+    key: keyof CreateTenantPayload;
+    type: string;
+    auto: string;
+  }[] = [
+    { key: 'name', type: 'text', auto: 'organization' },
+    { key: 'email', type: 'email', auto: 'email' },
+    { key: 'domain', type: 'text', auto: 'off' },
+    { key: 'password', type: 'password', auto: 'new-password' },
+    { key: 'phone', type: 'tel', auto: 'tel' },
+  ];
+
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -87,58 +96,21 @@ export default function CreateTenantModal({ open, onClose, onCreated }: CreateTe
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {[
-            { key: 'name' as const, type: 'text', auto: 'organization' },
-            { key: 'email' as const, type: 'email', auto: 'email' },
-            { key: 'domain' as const, type: 'text', auto: 'off' },
-            { key: 'admin_name' as const, type: 'text', auto: 'name' },
-            { key: 'admin_email' as const, type: 'email', auto: 'email' },
-            { key: 'admin_password' as const, type: 'password', auto: 'new-password' },
-          ].map((field) => (
+          {fields.map((field) => (
             <div key={field.key}>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 {t(`ateliers.create.fields.${field.key}`)}
               </label>
               <input
                 type={field.type}
-                value={String(form[field.key])}
-                onChange={(e) => set(field.key, e.target.value as CreateTenantPayload[typeof field.key])}
+                value={form[field.key]}
+                onChange={(e) => set(field.key, e.target.value)}
                 autoComplete={field.auto}
                 required
                 className={inputCls}
               />
             </div>
           ))}
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              {t('ateliers.create.fields.plan')}
-            </label>
-            <select
-              value={form.plan}
-              onChange={(e) => set('plan', e.target.value)}
-              className={inputCls}
-            >
-              <option value="basic">{t('plan_tiers.basic')}</option>
-              <option value="professional">{t('plan_tiers.professional')}</option>
-              <option value="enterprise">{t('plan_tiers.enterprise')}</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              {t('ateliers.create.fields.trial_days')}
-            </label>
-            <input
-              type="number"
-              min={0}
-              max={365}
-              value={form.trial_days}
-              onChange={(e) => set('trial_days', Number(e.target.value))}
-              className={inputCls}
-              required
-            />
-          </div>
 
           {error && (
             <div className="flex items-center gap-2 px-3 py-2.5 bg-rose-50 rounded-lg border border-rose-100 text-sm text-rose-600">

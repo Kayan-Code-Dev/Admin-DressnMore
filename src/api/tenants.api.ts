@@ -7,6 +7,26 @@ import type {
 import { apiFetch } from './client';
 import { parseJsonResponse } from './parseResponse';
 
+/**
+ * Laravel JsonResource often wraps the model as `{ data: { ... } }`.
+ * Some endpoints return the model at the top level.
+ */
+function unwrapTenantResource(body: unknown): Tenant {
+  if (body && typeof body === 'object' && body !== null) {
+    const o = body as Record<string, unknown>;
+    const inner = o.data;
+    if (
+      inner &&
+      typeof inner === 'object' &&
+      !Array.isArray(inner) &&
+      ('id' in inner || 'name' in inner)
+    ) {
+      return inner as Tenant;
+    }
+  }
+  return body as Tenant;
+}
+
 export async function fetchTenantsList(
   page: number,
   perPage = 15,
@@ -29,11 +49,11 @@ export async function fetchTenant(
   | { ok: false; message: string; unauthorized?: boolean }
 > {
   const res = await apiFetch(`/tenants/${encodeURIComponent(tenantId)}`);
-  const out = await parseJsonResponse<Tenant>(res);
+  const out = await parseJsonResponse<Record<string, unknown>>(res);
   if (out.ok === false) {
     return { ok: false, message: out.message, unauthorized: out.unauthorized };
   }
-  return { ok: true, tenant: out.data };
+  return { ok: true, tenant: unwrapTenantResource(out.data) };
 }
 
 export async function createTenant(

@@ -6,22 +6,22 @@ export type TenantDomain = {
   updated_at: string;
 };
 
+/** Matches GET /tenants and GET /tenants/:id tenant resource. */
 export type Tenant = {
   id: string;
   name: string;
   email: string;
   phone: string | null;
-  plan: string;
   is_active: boolean;
-  trial_ends_at: string | null;
   created_at: string;
   updated_at: string;
-  data: unknown;
-  admin_name: string;
-  admin_email: string;
-  admin_password?: string;
-  tenancy_db_name?: string;
   domains: TenantDomain[];
+  /** Present only on some API versions / legacy payloads */
+  trial_ends_at?: string | null;
+  admin_name?: string;
+  admin_email?: string;
+  tenancy_db_name?: string;
+  data?: unknown;
 };
 
 export type TenantsListResponse = {
@@ -43,16 +43,12 @@ export type CreateTenantPayload = {
   name: string;
   email: string;
   domain: string;
-  admin_name: string;
-  admin_email: string;
-  admin_password: string;
-  plan: string;
-  trial_days: number;
+  password: string;
+  phone: string;
 };
 
 export type UpdateTenantPayload = {
   name: string;
-  plan: string;
 };
 
 export type AddDomainPayload = {

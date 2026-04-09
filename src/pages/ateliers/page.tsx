@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import ConfirmDialog from '../../components/base/ConfirmDialog';
 import AdminLayout from '../../components/feature/AdminLayout';
 import AteliersTable from './components/AteliersTable';
 import CreateTenantModal from './components/CreateTenantModal';
-import EditTenantModal from './components/EditTenantModal';
-import StatusBadge, { PlanBadge } from '../../components/base/StatusBadge';
+import StatusBadge from '../../components/base/StatusBadge';
 import {
   fetchTenant,
   toggleTenantActive,
@@ -16,6 +16,7 @@ import {
   deleteTenant,
 } from '../../api/tenants.api';
 import { resolveTenantPortalUrl } from '../../config/tenantPortal.config';
+import { isBackendDomainSlug } from '../../lib/tenant.utils';
 import { tenantRowStatus, formatTenantDate } from '../../lib/tenant.utils';
 import type { Tenant } from '../../types/tenant.types';
 
@@ -33,7 +34,6 @@ export default function AteliersPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailTick, setDetailTick] = useState(0);
   const [createOpen, setCreateOpen] = useState(false);
-  const [editTenant, setEditTenant] = useState<Tenant | null>(null);
   const [listVersion, setListVersion] = useState(0);
   const [toggleBusy, setToggleBusy] = useState(false);
   const [newDomain, setNewDomain] = useState('');
@@ -43,12 +43,21 @@ export default function AteliersPage() {
   const [migrateBusy, setMigrateBusy] = useState(false);
   const [seedBusy, setSeedBusy] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [toolsError, setToolsError] = useState('');
+  const detailFetchIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!selectedId) {
       setDetail(null);
+      setDetailLoading(false);
+      detailFetchIdRef.current = null;
       return;
+    }
+    const switchedTenant = detailFetchIdRef.current !== selectedId;
+    detailFetchIdRef.current = selectedId;
+    if (switchedTenant) {
+      setDetail(null);
     }
     let cancelled = false;
     setDetailLoading(true);
@@ -68,6 +77,10 @@ export default function AteliersPage() {
     setDomainError('');
     setDeletingDomainId(null);
     setToolsError('');
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (!selectedId) setDeleteConfirmOpen(false);
   }, [selectedId]);
 
   const bumpList = () => setListVersion((v) => v + 1);
@@ -166,9 +179,8 @@ export default function AteliersPage() {
     setDetailTick((x) => x + 1);
   };
 
-  const handleDeleteTenant = async () => {
+  const handleDeleteTenantConfirm = async () => {
     if (!selected?.id) return;
-    if (!window.confirm(t('ateliers.modal.delete_tenant_confirm'))) return;
     setToolsError('');
     setDeleteBusy(true);
     const result = await deleteTenant(selected.id);
@@ -179,8 +191,10 @@ export default function AteliersPage() {
         return;
       }
       setToolsError(result.message);
+      setDeleteConfirmOpen(false);
       return;
     }
+    setDeleteConfirmOpen(false);
     setSelectedId(null);
     bumpList();
   };
@@ -193,7 +207,6 @@ export default function AteliersPage() {
         listVersion={listVersion}
         onAdd={() => setCreateOpen(true)}
         onViewDetails={(row) => setSelectedId(row.id)}
-        onEdit={(row) => setEditTenant(row)}
         onTenantMutated={() => setDetailTick((x) => x + 1)}
       />
 
@@ -203,17 +216,18 @@ export default function AteliersPage() {
         onCreated={bumpList}
       />
 
-      <EditTenantModal
-        open={editTenant !== null}
-        tenantId={editTenant?.id ?? ''}
-        initialName={editTenant?.name ?? ''}
-        initialPlan={editTenant?.plan ?? 'basic'}
-        onClose={() => setEditTenant(null)}
-        onSaved={() => {
-          bumpList();
-          setDetailTick((x) => x + 1);
-          setEditTenant(null);
-        }}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        title={t('ateliers.modal.delete_confirm_title')}
+        description={t('ateliers.modal.delete_tenant_confirm', {
+          name: selected?.name ?? '—',
+        })}
+        confirmLabel={t('ateliers.modal.delete_confirm_action')}
+        cancelLabel={t('ateliers.create.cancel')}
+        loading={deleteBusy}
+        onClose={() => !deleteBusy && setDeleteConfirmOpen(false)}
+        onConfirm={handleDeleteTenantConfirm}
+        variant="danger"
       />
 
       {selectedId && (
@@ -253,7 +267,6 @@ export default function AteliersPage() {
                       <p className="text-sm text-gray-500">{selected.email}</p>
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         <StatusBadge status={tenantRowStatus(selected)} size="sm" />
-                        <PlanBadge plan={selected.plan} />
                       </div>
                     </div>
                   </div>
@@ -261,18 +274,13 @@ export default function AteliersPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
                       {
-                        label: t('ateliers.modal.owner'),
-                        value: selected.admin_name,
-                        icon: 'ri-user-line',
-                      },
-                      {
-                        label: t('ateliers.modal.admin_email'),
-                        value: selected.admin_email,
-                        icon: 'ri-mail-line',
+                        label: t('ateliers.modal.tenant_id'),
+                        value: selected.id,
+                        icon: 'ri-fingerprint-line',
                       },
                       {
                         label: t('ateliers.modal.phone'),
-                        value: selected.phone ?? '—',
+                        value: selected.phone?.trim() || '—',
                         icon: 'ri-phone-line',
                       },
                       {
@@ -281,14 +289,9 @@ export default function AteliersPage() {
                         icon: 'ri-calendar-line',
                       },
                       {
-                        label: t('ateliers.modal.trial_ends'),
-                        value: formatTenantDate(selected.trial_ends_at),
+                        label: t('ateliers.modal.updated'),
+                        value: formatTenantDate(selected.updated_at),
                         icon: 'ri-time-line',
-                      },
-                      {
-                        label: t('ateliers.modal.db_name'),
-                        value: selected.tenancy_db_name ?? '—',
-                        icon: 'ri-database-2-line',
                       },
                     ].map((item) => (
                       <div key={item.label} className="bg-gray-50 rounded-xl p-3 sm:col-span-2">
@@ -312,23 +315,29 @@ export default function AteliersPage() {
                       <ul className="space-y-1.5">
                         {selected.domains.map((d) => {
                           const portalUrl = resolveTenantPortalUrl(d.domain);
+                          const kind = isBackendDomainSlug(d.domain) ? 'backend' : 'storefront';
                           return (
                           <li
                             key={d.id}
                             className="flex items-center justify-between gap-2 bg-gray-50 rounded-lg px-3 py-2 border border-gray-100"
                           >
-                            {portalUrl ? (
-                              <a
-                                href={portalUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-mono text-sm text-teal-600 hover:text-teal-700 hover:underline truncate min-w-0"
-                              >
-                                {portalUrl}
-                              </a>
-                            ) : (
-                              <span className="font-mono text-sm text-gray-800 truncate">{d.domain}</span>
-                            )}
+                            <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                                {t(`ateliers.modal.domain_kind_${kind}`)}
+                              </span>
+                              {portalUrl ? (
+                                <a
+                                  href={portalUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-mono text-sm text-teal-600 hover:text-teal-700 hover:underline break-all"
+                                >
+                                  {portalUrl}
+                                </a>
+                              ) : (
+                                <span className="font-mono text-sm text-gray-800 break-all">{d.domain}</span>
+                              )}
+                            </div>
                             <button
                               type="button"
                               disabled={deletingDomainId === d.id}
@@ -423,29 +432,15 @@ export default function AteliersPage() {
                   <button
                     type="button"
                     disabled={migrateBusy || seedBusy || deleteBusy}
-                    onClick={() => void handleDeleteTenant()}
+                    onClick={() => setDeleteConfirmOpen(true)}
                     className="flex-1 min-w-[100px] flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                   >
-                    {deleteBusy ? (
-                      <i className="ri-loader-4-line animate-spin" />
-                    ) : (
-                      <i className="ri-delete-bin-line" />
-                    )}
+                    <i className="ri-delete-bin-line" />
                     {t('ateliers.modal.delete_tenant')}
                   </button>
                 </div>
 
                 <div className="px-6 pb-5 flex items-center gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    disabled={migrateBusy || seedBusy || deleteBusy}
-                    onClick={() => {
-                      setEditTenant(selected);
-                    }}
-                    className="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap transition-colors"
-                  >
-                    <i className="ri-edit-line" /> {t('ateliers.modal.edit')}
-                  </button>
                   <button
                     type="button"
                     disabled={toggleBusy || migrateBusy || seedBusy || deleteBusy}

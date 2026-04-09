@@ -1,7 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { type ReactNode } from 'react';
 
-type StatusVariant = 'active' | 'suspended' | 'pending' | 'trial' | 'cancelled' | 'expired' | 'paid' | 'refunded';
+type StatusVariant =
+  | 'active'
+  | 'suspended'
+  | 'pending'
+  | 'trial'
+  | 'cancelled'
+  | 'expired'
+  | 'rejected'
+  | 'paid'
+  | 'refunded';
 
 interface StatusBadgeProps {
   status: StatusVariant | string;
@@ -14,6 +23,7 @@ const statusConfig: Record<string, { classes: string; dot: string }> = {
   pending:   { classes: 'bg-amber-50 text-amber-700',    dot: 'bg-amber-500'   },
   trial:     { classes: 'bg-teal-50 text-teal-700',      dot: 'bg-teal-500'    },
   cancelled: { classes: 'bg-gray-100 text-gray-600',     dot: 'bg-gray-400'    },
+  rejected:  { classes: 'bg-rose-50 text-rose-800',      dot: 'bg-rose-500'    },
   expired:   { classes: 'bg-gray-100 text-gray-500',     dot: 'bg-gray-400'    },
   paid:      { classes: 'bg-emerald-50 text-emerald-700',dot: 'bg-emerald-500' },
   refunded:  { classes: 'bg-rose-50 text-rose-700',      dot: 'bg-rose-500'    },
@@ -35,7 +45,7 @@ export default function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
 }
 
 interface PlanBadgeProps {
-  plan: string;
+  plan?: string | null;
 }
 
 const planColors: Record<string, string> = {
@@ -53,7 +63,14 @@ function planTierLookupKey(plan: string): string {
 
 export function PlanBadge({ plan }: PlanBadgeProps) {
   const { t } = useTranslation();
-  const key = plan.trim();
+  const key = (plan ?? '').trim();
+  if (!key) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+        —
+      </span>
+    );
+  }
   const normalized =
     key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
   const cls =

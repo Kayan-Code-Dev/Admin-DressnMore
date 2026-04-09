@@ -9,8 +9,22 @@ export function tenantRowStatus(tenant: Tenant): 'active' | 'suspended' | 'trial
   return 'active';
 }
 
+/** First domain in API order (legacy). */
 export function primaryDomain(tenant: Tenant): string {
   return tenant.domains?.[0]?.domain ?? '—';
+}
+
+/** API may register `tenant.backend` for the tenant API host; storefront uses the plain slug. */
+export function isBackendDomainSlug(domain: string): boolean {
+  return domain.trim().toLowerCase().endsWith('.backend');
+}
+
+/** Customer storefront slug (excludes `*.backend` rows). */
+export function storefrontDomainSlug(tenant: Tenant): string {
+  const list = tenant.domains ?? [];
+  const front = list.find((d) => !isBackendDomainSlug(d.domain));
+  if (front) return front.domain;
+  return list[0]?.domain ?? '—';
 }
 
 export function formatTenantDate(iso: string | null): string {

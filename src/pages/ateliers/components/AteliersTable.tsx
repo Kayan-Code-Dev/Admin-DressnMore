@@ -10,13 +10,13 @@ import {
   flexRender,
   type SortingState,
 } from '@tanstack/react-table';
-import StatusBadge, { PlanBadge, ActionIconButton } from '../../../components/base/StatusBadge';
+import StatusBadge, { ActionIconButton } from '../../../components/base/StatusBadge';
 import {
   fetchTenantsList,
   toggleTenantActive,
 } from '../../../api/tenants.api';
 import { resolveTenantPortalUrl } from '../../../config/tenantPortal.config';
-import { tenantRowStatus, primaryDomain, formatTenantDate } from '../../../lib/tenant.utils';
+import { tenantRowStatus, storefrontDomainSlug, formatTenantDate } from '../../../lib/tenant.utils';
 import type { Tenant } from '../../../types/tenant.types';
 
 type FilterType = 'all' | 'active' | 'suspended' | 'trial';
@@ -30,7 +30,6 @@ function initials(name: string): string {
 
 interface AteliersTableProps {
   onViewDetails: (tenant: Tenant) => void;
-  onEdit: (tenant: Tenant) => void;
   onAdd: () => void;
   listVersion: number;
   /** Called after suspend/activate so open detail modals can refetch */
@@ -39,7 +38,6 @@ interface AteliersTableProps {
 
 export default function AteliersTable({
   onViewDetails,
-  onEdit,
   onAdd,
   listVersion,
   onTenantMutated,
@@ -108,15 +106,23 @@ export default function AteliersTable({
     const q = globalFilter.trim().toLowerCase();
     if (!q) return list;
     return list.filter((r) => {
-      const raw = primaryDomain(r);
+      const raw = storefrontDomainSlug(r);
       const portalUrl =
         raw && raw !== '—' ? resolveTenantPortalUrl(raw) : null;
+      const anyDomainMatches = (r.domains ?? []).some((d) => {
+        const u = resolveTenantPortalUrl(d.domain);
+        return (
+          d.domain.toLowerCase().includes(q) ||
+          (u?.toLowerCase().includes(q) ?? false)
+        );
+      });
       return (
         r.name.toLowerCase().includes(q) ||
         r.email.toLowerCase().includes(q) ||
         raw.toLowerCase().includes(q) ||
         (portalUrl?.toLowerCase().includes(q) ?? false) ||
-        r.admin_name.toLowerCase().includes(q)
+        anyDomainMatches ||
+        (r.phone ?? '').toLowerCase().includes(q)
       );
     });
   }, [rows, statusFilter, globalFilter]);
@@ -141,22 +147,19 @@ export default function AteliersTable({
         },
       }),
       columnHelper.display({
-        id: 'admin_name',
-        header: () => t('ateliers.col.owner'),
+        id: 'phone',
+        header: () => t('ateliers.col.phone'),
         cell: (info) => (
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 flex-shrink-0">
-              <i className="ri-user-line text-xs" />
-            </div>
-            <span className="text-sm text-gray-700">{info.row.original.admin_name}</span>
-          </div>
+          <span className="text-sm text-gray-700 font-mono">
+            {info.row.original.phone?.trim() || '—'}
+          </span>
         ),
       }),
       columnHelper.display({
         id: 'domain',
-        header: () => t('ateliers.col.domain'),
+        header: () => t('ateliers.col.storefront'),
         cell: (info) => {
-          const raw = primaryDomain(info.row.original);
+          const raw = storefrontDomainSlug(info.row.original);
           const url =
             raw && raw !== '—' ? resolveTenantPortalUrl(raw) : null;
           if (!url) {
@@ -173,10 +176,6 @@ export default function AteliersTable({
             </a>
           );
         },
-      }),
-      columnHelper.accessor('plan', {
-        header: () => t('ateliers.col.plan'),
-        cell: (info) => <PlanBadge plan={info.getValue()} />,
       }),
       columnHelper.display({
         id: 'status',
@@ -206,12 +205,6 @@ export default function AteliersTable({
                 onClick={() => onViewDetails(row)}
               />
               <ActionIconButton
-                icon="ri-edit-line"
-                label={t('actions.edit')}
-                variant="default"
-                onClick={() => onEdit(row)}
-              />
-              <ActionIconButton
                 icon={busy ? 'ri-loader-4-line' : row.is_active ? 'ri-pause-circle-line' : 'ri-play-circle-line'}
                 label={row.is_active ? t('actions.suspend') : t('actions.activate')}
                 variant="warning"
@@ -224,7 +217,7 @@ export default function AteliersTable({
         },
       }),
     ],
-    [t, onViewDetails, onEdit, togglingId, handleToggleActive],
+    [t, onViewDetails, togglingId, handleToggleActive],
   );
 
   const table = useReactTable({
