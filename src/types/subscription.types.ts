@@ -31,9 +31,25 @@ export type AdminSubscriptionsListResponse = {
   total: number;
 };
 
+/** Payment row nested under GET /admin/subscriptions/:id */
+export type SubscriptionPayment = {
+  id: number;
+  subscription_id: number;
+  plan_id: number;
+  plan_title: string;
+  tenant_id: string;
+  starts_at: string;
+  ends_at: string;
+  price: string;
+  paid_at: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+};
+
 /** GET /admin/subscriptions/:id */
 export type AdminSubscriptionDetail = AdminSubscription & {
-  payments: unknown[];
+  payments: SubscriptionPayment[];
 };
 
 export type PatchSubscriptionStatusPayload = {

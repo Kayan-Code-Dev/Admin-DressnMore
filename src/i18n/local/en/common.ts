@@ -156,6 +156,14 @@ const en = {
       status: 'Status',
       payments: 'Payments',
       no_payments: 'No payments recorded.',
+      payments_table: {
+        id: 'ID',
+        plan: 'Plan',
+        price: 'Amount',
+        paid_at: 'Paid at',
+        period: 'Coverage period',
+        status: 'Status',
+      },
       save_status: 'Apply status',
       saving: 'Saving…',
     },
@@ -320,7 +328,8 @@ const en = {
   },
   status: {
     active: 'Active', suspended: 'Suspended', pending: 'Pending', trial: 'Trial',
-    cancelled: 'Cancelled', expired: 'Expired', approved: 'Approved', rejected: 'Rejected', paid: 'Paid', refunded: 'Refunded', failed: 'Failed',
+    cancelled: 'Cancelled', expired: 'Expired', approved: 'Approved', rejected: 'Rejected',
+    completed: 'Completed', paid: 'Paid', refunded: 'Refunded', failed: 'Failed',
   },
   coming_soon: {
     title: 'Coming Soon', badge: 'This page is under development',

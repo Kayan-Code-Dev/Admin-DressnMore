@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import StatusBadge from '../../../components/base/StatusBadge';
 import { fetchSubscription, patchSubscriptionStatus } from '../../../api/subscriptions.api';
-import type { AdminSubscriptionDetail, SubscriptionStatusValue } from '../../../types/subscription.types';
+import type {
+  AdminSubscriptionDetail,
+  SubscriptionPayment,
+  SubscriptionStatusValue,
+} from '../../../types/subscription.types';
 
 const STATUS_OPTIONS: SubscriptionStatusValue[] = ['pending', 'active', 'rejected', 'cancelled'];
 
@@ -47,7 +51,11 @@ export default function SubscriptionDetailModal({
         setDetail(null);
         return;
       }
-      setDetail(r.subscription);
+      const sub = r.subscription;
+      const payments: SubscriptionPayment[] = Array.isArray(sub.payments)
+        ? (sub.payments as SubscriptionPayment[])
+        : [];
+      setDetail({ ...sub, payments });
       const st = r.subscription.status as SubscriptionStatusValue;
       setStatusDraft(STATUS_OPTIONS.includes(st) ? st : 'pending');
     });
@@ -82,7 +90,7 @@ export default function SubscriptionDetailModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-lg my-4 shadow-xl"
+        className="bg-white rounded-2xl w-full max-w-3xl my-4 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -164,9 +172,54 @@ export default function SubscriptionDetailModal({
                 {detail.payments.length === 0 ? (
                   <p className="text-sm text-gray-500">{t('subscriptions.detail.no_payments')}</p>
                 ) : (
-                  <pre className="text-xs bg-gray-50 rounded-lg p-3 overflow-x-auto max-h-48 text-gray-700">
-                    {JSON.stringify(detail.payments, null, 2)}
-                  </pre>
+                  <div className="rounded-xl border border-gray-100 overflow-hidden ring-1 ring-gray-100/80">
+                    <div className="overflow-x-auto max-h-64 overflow-y-auto">
+                      <table className="w-full text-sm min-w-[640px]">
+                        <thead className="bg-gray-50 sticky top-0 z-[1]">
+                          <tr>
+                            <th className="px-3 py-2.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                              {t('subscriptions.detail.payments_table.id')}
+                            </th>
+                            <th className="px-3 py-2.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                              {t('subscriptions.detail.payments_table.plan')}
+                            </th>
+                            <th className="px-3 py-2.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                              {t('subscriptions.detail.payments_table.price')}
+                            </th>
+                            <th className="px-3 py-2.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                              {t('subscriptions.detail.payments_table.paid_at')}
+                            </th>
+                            <th className="px-3 py-2.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                              {t('subscriptions.detail.payments_table.period')}
+                            </th>
+                            <th className="px-3 py-2.5 text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                              {t('subscriptions.detail.payments_table.status')}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 bg-white">
+                          {detail.payments.map((p) => (
+                            <tr key={p.id} className="hover:bg-gray-50/80 transition-colors">
+                              <td className="px-3 py-2.5 font-mono text-xs text-gray-600 tabular-nums">{p.id}</td>
+                              <td className="px-3 py-2.5 font-medium text-gray-900">{p.plan_title}</td>
+                              <td className="px-3 py-2.5 font-semibold text-gray-900 tabular-nums">${p.price}</td>
+                              <td className="px-3 py-2.5 text-gray-600 text-xs whitespace-nowrap">{p.paid_at}</td>
+                              <td className="px-3 py-2.5 text-gray-600 text-xs">
+                                <div className="whitespace-nowrap">{p.starts_at}</div>
+                                <div className="text-gray-400 whitespace-nowrap">
+                                  <span className="font-mono text-[10px] me-1">→</span>
+                                  {p.ends_at}
+                                </div>
+                              </td>
+                              <td className="px-3 py-2.5">
+                                <StatusBadge status={p.status} size="sm" />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 )}
               </div>
             </>

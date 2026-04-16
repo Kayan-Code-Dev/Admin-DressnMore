@@ -155,6 +155,14 @@ const ar = {
       status: 'الحالة',
       payments: 'المدفوعات',
       no_payments: 'لا توجد مدفوعات مسجلة.',
+      payments_table: {
+        id: 'الرقم',
+        plan: 'الباقة',
+        price: 'المبلغ',
+        paid_at: 'تاريخ الدفع',
+        period: 'فترة التغطية',
+        status: 'الحالة',
+      },
       save_status: 'تطبيق الحالة',
       saving: 'جارٍ الحفظ…',
     },
@@ -319,7 +327,8 @@ const ar = {
   },
   status: {
     active: 'نشط', suspended: 'موقوف', pending: 'معلق', trial: 'تجريبي',
-    cancelled: 'ملغي', expired: 'منتهي', approved: 'موافق', rejected: 'مرفوض', paid: 'مدفوع', refunded: 'مسترجع', failed: 'فاشل',
+    cancelled: 'ملغي', expired: 'منتهي', approved: 'موافق', rejected: 'مرفوض',
+    completed: 'مكتمل', paid: 'مدفوع', refunded: 'مسترجع', failed: 'فاشل',
   },
   coming_soon: {
     title: 'قريباً', badge: 'هذه الصفحة قيد التطوير',

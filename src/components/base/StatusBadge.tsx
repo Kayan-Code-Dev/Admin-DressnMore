@@ -10,6 +10,7 @@ type StatusVariant =
   | 'expired'
   | 'rejected'
   | 'approved'
+  | 'completed'
   | 'paid'
   | 'refunded';
 
@@ -21,6 +22,7 @@ interface StatusBadgeProps {
 const statusConfig: Record<string, { classes: string; dot: string }> = {
   active:    { classes: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-500' },
   approved:  { classes: 'bg-emerald-50 text-emerald-800', dot: 'bg-emerald-600' },
+  completed: { classes: 'bg-teal-50 text-teal-800',      dot: 'bg-teal-600' },
   suspended: { classes: 'bg-rose-50 text-rose-700',      dot: 'bg-rose-500'    },
   pending:   { classes: 'bg-amber-50 text-amber-700',    dot: 'bg-amber-500'   },
   trial:     { classes: 'bg-teal-50 text-teal-700',      dot: 'bg-teal-500'    },
