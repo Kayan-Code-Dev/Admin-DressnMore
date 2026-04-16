@@ -1,7 +1,8 @@
 const en = {
   nav: {
     groups: { overview: 'Overview', business: 'Business', management: 'Management', platform: 'Platform' },
-    dashboard: 'Dashboard', ateliers: 'Ateliers', subscriptions: 'Subscriptions', plans: 'Plans',
+    dashboard: 'Dashboard', ateliers: 'Ateliers', subscriptions: 'Subscriptions', order_plans: 'Plan package orders',
+    plans: 'Plans',
     payments: 'Payments', payment_gateways: 'Payment Gateways', users: 'Users', admin_roles: 'Admin Roles', settings: 'Settings',
     feature_flags: 'Feature Flags', support: 'Support', notifications: 'Notifications',
     logs: 'Logs', integrations: 'Integrations', marketing: 'Marketing', sign_out: 'Sign Out',
@@ -11,6 +12,7 @@ const en = {
     dashboard:         { title: 'Dashboard',           subtitle: 'Welcome back, Super Admin' },
     ateliers:          { title: 'Ateliers',             subtitle: 'Manage all registered ateliers' },
     subscriptions:     { title: 'Subscriptions',        subtitle: 'Monitor all active subscriptions' },
+    order_plans:         { title: 'Plan package orders', subtitle: 'Review and approve requests to purchase plan packages' },
     plans:             { title: 'Plans',                subtitle: 'Manage pricing plans & features' },
     payments:          { title: 'Payments',             subtitle: 'Track all transactions' },
     payment_gateways:  { title: 'Payment Gateways',     subtitle: 'Manage manual payment methods' },
@@ -39,8 +41,8 @@ const en = {
   },
   table: {
     showing: 'Showing', of: 'of',
-    no_ateliers: 'No ateliers found', no_subscriptions: 'No subscriptions found',
-    ateliers_count: 'ateliers', subscriptions_count: 'subscriptions',
+    no_ateliers: 'No ateliers found', no_subscriptions: 'No subscriptions found', no_order_plans: 'No plan package orders yet',
+    ateliers_count: 'ateliers', subscriptions_count: 'subscriptions', order_plans_count: 'orders',
   },
   /** Tenant/subscription plan tier labels (API slugs + common aliases) */
   plan_tiers: {
@@ -158,6 +160,39 @@ const en = {
       saving: 'Saving…',
     },
     free_trial: 'Free Trial', monthly: 'monthly', yearly: 'yearly',
+  },
+  order_plans: {
+    loading: 'Loading plan package orders…',
+    summary: {
+      total: 'Total package orders',
+      approved: 'Approved',
+      rejected: 'Rejected',
+      page_scope: 'this page',
+    },
+    search_on_page: '{{count}} matches on this page',
+    search_placeholder: 'Search by name, email, tenant…',
+    filter: { all: 'All', approved: 'Approved', rejected: 'Rejected' },
+    col: {
+      id: 'ID',
+      name: 'Customer',
+      phone: 'Phone',
+      plan: 'Plan',
+      price: 'Price',
+      tenant_id: 'Tenant ID',
+      subscription_id: 'Subscription',
+      status: 'Status',
+      created_at: 'Created',
+      updated_at: 'Updated',
+      actions: 'Actions',
+    },
+    detail: {
+      title: 'Plan package order details',
+      customer: 'Customer',
+      plan_section: 'Requested plan',
+      status: 'Decision',
+      save_status: 'Apply status',
+      saving: 'Saving…',
+    },
   },
   plans: {
     add_plan: 'Add Plan', edit_plan: 'Edit Plan', delete_plan: 'Delete Plan',
@@ -285,7 +320,7 @@ const en = {
   },
   status: {
     active: 'Active', suspended: 'Suspended', pending: 'Pending', trial: 'Trial',
-    cancelled: 'Cancelled', expired: 'Expired', rejected: 'Rejected', paid: 'Paid', refunded: 'Refunded', failed: 'Failed',
+    cancelled: 'Cancelled', expired: 'Expired', approved: 'Approved', rejected: 'Rejected', paid: 'Paid', refunded: 'Refunded', failed: 'Failed',
   },
   coming_soon: {
     title: 'Coming Soon', badge: 'This page is under development',

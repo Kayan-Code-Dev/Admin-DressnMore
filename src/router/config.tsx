@@ -6,6 +6,7 @@ import DashboardPage from '../pages/dashboard/page';
 import AteliersPage from '../pages/ateliers/page';
 import SubscriptionsPage from '../pages/subscriptions/page';
 import PlansPage from '../pages/plans/page';
+import OrderPlansPage from '../pages/order-plans/page';
 import PaymentsPage from '../pages/payments/page';
 import SettingsPage from '../pages/settings/page';
 import SupportPage from '../pages/support/page';
@@ -26,6 +27,7 @@ const routes: RouteObject[] = [
   { path: '/ateliers',      element: <AuthGuard><AteliersPage /></AuthGuard> },
   { path: '/subscriptions', element: <AuthGuard><SubscriptionsPage /></AuthGuard> },
   { path: '/plans',         element: <AuthGuard><PlansPage /></AuthGuard> },
+  { path: '/order-plans',  element: <AuthGuard><OrderPlansPage /></AuthGuard> },
   { path: '/payments',      element: <AuthGuard><PaymentsPage /></AuthGuard> },
   { path: '/payment-gateways',  element: <AuthGuard><PaymentGatewaysPage /></AuthGuard> },
   { path: '/users',         element: <AuthGuard><UsersPage /></AuthGuard> },

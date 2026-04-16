@@ -18,6 +18,7 @@ const navGroups: { groupKey: string; items: NavItem[] }[] = [
     items: [
       { path: '/ateliers',          labelKey: 'nav.ateliers',          icon: 'ri-store-2-line' },
       { path: '/subscriptions',     labelKey: 'nav.subscriptions',     icon: 'ri-checkbox-circle-line' },
+      { path: '/order-plans',       labelKey: 'nav.order_plans',        icon: 'ri-shopping-bag-3-line' },
       { path: '/plans',             labelKey: 'nav.plans',             icon: 'ri-price-tag-3-line' },
       { path: '/payments',          labelKey: 'nav.payments',          icon: 'ri-bank-card-line' },
       { path: '/payment-gateways',  labelKey: 'nav.payment_gateways',  icon: 'ri-secure-payment-line' },

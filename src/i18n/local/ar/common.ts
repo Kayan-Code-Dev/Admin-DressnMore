@@ -1,7 +1,8 @@
 const ar = {
   nav: {
     groups: { overview: 'نظرة عامة', business: 'الأعمال', management: 'الإدارة', platform: 'المنصة' },
-    dashboard: 'لوحة التحكم', ateliers: 'الأتيليهات', subscriptions: 'الاشتراكات', plans: 'الباقات',
+    dashboard: 'لوحة التحكم', ateliers: 'الأتيليهات', subscriptions: 'الاشتراكات', order_plans: 'طلبات الباقات',
+    plans: 'الباقات',
     payments: 'المدفوعات', payment_gateways: 'بوابات الدفع', users: 'المستخدمون', admin_roles: 'أدوار المسؤولين', settings: 'الإعدادات',
     feature_flags: 'إعدادات الميزات', support: 'الدعم الفني', notifications: 'الإشعارات',
     logs: 'السجلات', integrations: 'التكاملات', marketing: 'التسويق', sign_out: 'تسجيل الخروج',
@@ -11,6 +12,7 @@ const ar = {
     dashboard:         { title: 'لوحة التحكم',         subtitle: 'مرحباً بعودتك، المسؤول العام' },
     ateliers:          { title: 'الأتيليهات',           subtitle: 'إدارة جميع الأتيليهات المسجلة' },
     subscriptions:     { title: 'الاشتراكات',           subtitle: 'متابعة جميع الاشتراكات النشطة' },
+    order_plans:       { title: 'طلبات الباقات',        subtitle: 'مراجعة طلبات شراء الباقات والموافقة عليها' },
     plans:             { title: 'الباقات',              subtitle: 'إدارة باقات الأسعار والميزات' },
     payments:          { title: 'المدفوعات',            subtitle: 'تتبع جميع المعاملات المالية' },
     payment_gateways:  { title: 'بوابات الدفع',         subtitle: 'إدارة طرق الدفع اليدوية' },
@@ -39,8 +41,8 @@ const ar = {
   },
   table: {
     showing: 'عرض', of: 'من',
-    no_ateliers: 'لا توجد أتيليهات', no_subscriptions: 'لا توجد اشتراكات',
-    ateliers_count: 'أتيليه', subscriptions_count: 'اشتراك',
+    no_ateliers: 'لا توجد أتيليهات', no_subscriptions: 'لا توجد اشتراكات', no_order_plans: 'لا توجد طلبات باقات بعد',
+    ateliers_count: 'أتيليه', subscriptions_count: 'اشتراك', order_plans_count: 'طلب',
   },
   plan_tiers: {
     basic: 'أساسية',
@@ -157,6 +159,39 @@ const ar = {
       saving: 'جارٍ الحفظ…',
     },
     free_trial: 'تجربة مجانية', monthly: 'شهري', yearly: 'سنوي',
+  },
+  order_plans: {
+    loading: 'جارٍ تحميل طلبات الباقات…',
+    summary: {
+      total: 'إجمالي طلبات الباقات',
+      approved: 'موافق',
+      rejected: 'مرفوض',
+      page_scope: 'هذه الصفحة',
+    },
+    search_on_page: '{{count}} نتيجة في هذه الصفحة',
+    search_placeholder: 'ابحث بالاسم أو البريد أو المستأجر…',
+    filter: { all: 'الكل', approved: 'موافق', rejected: 'مرفوض' },
+    col: {
+      id: 'الرقم',
+      name: 'العميل',
+      phone: 'الهاتف',
+      plan: 'الباقة',
+      price: 'السعر',
+      tenant_id: 'معرّف المستأجر',
+      subscription_id: 'الاشتراك',
+      status: 'الحالة',
+      created_at: 'تاريخ الإنشاء',
+      updated_at: 'آخر تحديث',
+      actions: 'الإجراءات',
+    },
+    detail: {
+      title: 'تفاصيل طلب الباقة',
+      customer: 'العميل',
+      plan_section: 'الباقة المطلوبة',
+      status: 'القرار',
+      save_status: 'تطبيق الحالة',
+      saving: 'جارٍ الحفظ…',
+    },
   },
   plans: {
     add_plan: 'إضافة باقة', edit_plan: 'تعديل الباقة', delete_plan: 'حذف الباقة',
@@ -284,7 +319,7 @@ const ar = {
   },
   status: {
     active: 'نشط', suspended: 'موقوف', pending: 'معلق', trial: 'تجريبي',
-    cancelled: 'ملغي', expired: 'منتهي', rejected: 'مرفوض', paid: 'مدفوع', refunded: 'مسترجع', failed: 'فاشل',
+    cancelled: 'ملغي', expired: 'منتهي', approved: 'موافق', rejected: 'مرفوض', paid: 'مدفوع', refunded: 'مسترجع', failed: 'فاشل',
   },
   coming_soon: {
     title: 'قريباً', badge: 'هذه الصفحة قيد التطوير',
