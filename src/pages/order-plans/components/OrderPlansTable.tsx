@@ -119,12 +119,29 @@ export default function OrderPlansTable() {
           password: r.data.admin.password,
           tenantName: r.data.tenant?.name || r.data.hostname_label,
         });
+      } else {
+        // Only reload if no popup needed
+        await loadList();
       }
-
-      await loadList();
     },
     [navigate, loadList],
   );
+
+  // Add this function to handle popup close
+  const handleCredentialsPopupClose = useCallback(() => {
+    setCredentialsPopup(prev => ({ ...prev, isOpen: false }));
+    // Reload the list after popup is closed
+    void loadList();
+  }, [loadList]);
+
+  // In the JSX, update the CredentialsPopup:
+  <CredentialsPopup
+    isOpen={credentialsPopup.isOpen}
+    onClose={handleCredentialsPopupClose}
+    email={credentialsPopup.email}
+    password={credentialsPopup.password}
+    tenantName={credentialsPopup.tenantName}
+  />
 
   const columns = useMemo(
     () => [
