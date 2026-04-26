@@ -1,6 +1,9 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import CredentialsPopup from '../base/CredentialsPopup';
+import type { PatchOrderPlanStatusResponse } from '../../../api/orderPlans.api';
+
 import {
   useReactTable,
   getCoreRowModel,
@@ -36,6 +39,19 @@ export default function OrderPlansTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [detailId, setDetailId] = useState<number | null>(null);
   const [patchingId, setPatchingId] = useState<number | null>(null);
+
+  // State for credentials popup
+  const [credentialsPopup, setCredentialsPopup] = useState<{
+    isOpen: boolean;
+    email: string;
+    password: string;
+    tenantName?: string;
+  }>({
+    isOpen: false,
+    email: '',
+    password: '',
+    tenantName: '',
+  });
 
   const loadList = useCallback(async () => {
     setListError('');
@@ -85,6 +101,7 @@ export default function OrderPlansTable() {
       setPatchingId(id);
       const r = await patchOrderPlanStatus(id, { status });
       setPatchingId(null);
+
       if (r.ok === false) {
         if (r.unauthorized) {
           navigate('/admin/login', { replace: true });
@@ -93,6 +110,17 @@ export default function OrderPlansTable() {
         setListError(r.message);
         return;
       }
+
+      // Show credentials popup if status is approved and admin data exists
+      if (status === 'approved' && r.data.admin) {
+        setCredentialsPopup({
+          isOpen: true,
+          email: r.data.admin.email,
+          password: r.data.admin.password,
+          tenantName: r.data.tenant?.name || r.data.hostname_label,
+        });
+      }
+
       await loadList();
     },
     [navigate, loadList],
@@ -379,6 +407,15 @@ export default function OrderPlansTable() {
         orderPlanId={detailId}
         onClose={() => setDetailId(null)}
         onUpdated={() => void loadList()}
+      />
+
+      {/* Credentials Popup */}
+      <CredentialsPopup
+        isOpen={credentialsPopup.isOpen}
+        onClose={() => setCredentialsPopup(prev => ({ ...prev, isOpen: false }))}
+        email={credentialsPopup.email}
+        password={credentialsPopup.password}
+        tenantName={credentialsPopup.tenantName}
       />
     </div>
   );

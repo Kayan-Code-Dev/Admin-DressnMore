@@ -560,6 +560,20 @@ const ar = {
       cancel: 'إلغاء',
     },
   },
+  // Credentials Popup Translations
+  credentials: {
+    popup: {
+      title: 'بيانات اعتماد المدير',
+      subtitle: 'احفظ هذه البيانات الآن',
+      email: 'البريد الإلكتروني',
+      password: 'كلمة السر',
+      copy: 'نسخ إلى الحافظة',
+      copy_all: 'نسخ الكل',
+      close: 'إغلاق',
+      warning: 'تظهر كلمة السر هذه مرة واحدة فقط. يرجى حفظها بشكل آمن لأنه لا يمكن استرجاعها لاحقاً.',
+      tenant: 'اسم المستأجر',
+    },
+  },
 };
 
 export default ar;
