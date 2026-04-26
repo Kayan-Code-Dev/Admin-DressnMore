@@ -424,6 +424,14 @@ export default function OrderPlansTable() {
         orderPlanId={detailId}
         onClose={() => setDetailId(null)}
         onUpdated={() => void loadList()}
+        onShowCredentials={(email, password, tenantName) => {
+          setCredentialsPopup({
+            isOpen: true,
+            email,
+            password,
+            tenantName,
+          });
+        }}
       />
 
       {/* Credentials Popup */}
