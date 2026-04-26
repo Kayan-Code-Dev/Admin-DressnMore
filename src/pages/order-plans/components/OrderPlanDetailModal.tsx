@@ -11,13 +11,17 @@ interface OrderPlanDetailModalProps {
   orderPlanId: number | null;
   onClose: () => void;
   onUpdated: () => void;
+  onShowCredentials?: (email: string, password: string, tenantName?: string) => void; // Add this
 }
+
 
 export default function OrderPlanDetailModal({
   orderPlanId,
   onClose,
   onUpdated,
+  onShowCredentials, // Add this
 }: OrderPlanDetailModalProps) {
+
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -71,6 +75,13 @@ export default function OrderPlanDetailModal({
       }
       setError(r.message);
       return;
+    }
+    if (statusDraft === 'approved' && r.data.admin) {
+      onShowCredentials?.(
+        r.data.admin.email,
+        r.data.admin.password,
+        r.data.tenant?.name || r.data.hostname_label
+      );
     }
     onUpdated();
     onClose();
